@@ -61,21 +61,57 @@ Promise.all([
   var yearData = dataForYear(csv, 1850); // first map with the data of the first year
   drawTheMap(world, yearData);
 
-  d3.select("input")
+  d3.select("#yearSlider")
     .on("change", function() {
+      d3.select("#allYearsCheckbox").property('checked', false);
+
       var yearInput = +d3.select(this).node().value;
       var yearData = dataForYear(csv, yearInput);
       drawTheMap(world, yearData);
     });
+  
+
+  // checkbox for all years
+  d3.select("#allYearsCheckbox").on("change", function(d){
+    var checked = d3.select(this).property("checked");
+    if(checked){
+      yearData = dataForAllYears(csv);
+      drawTheMap(world, yearData);
+
+      d3.select("#demo").text("all");
+      //TODO d3.select("#yearSlider").property('value', VALUE TO HIDE THE THUMB
+    } else {
+      yearData = dataForYear(csv, 1850);
+      drawTheMap(world, yearData);
+
+      d3.select("#demo").text("1850");
+      d3.select("#yearSlider").property('value', 1850);
+  }});
 });
 
 function dataForYear(csv, year){
   var newData = new Map();
   csv.forEach(function(d) {
     if (d.gas === "KYOTOGHG" && d.sector === "Total excluding LULUCF" && !(COUNTRY_BIG_CATEGS.includes(d.country)) && +d.year === year) {
-      newData.set(d.country, +d["value (MtCO2e)"])
+      newData.set(d.country, +d["value (MtCO2e)"]);
     }
   })
+  return newData;
+}
+
+//TODO clean this code
+function dataForAllYears(csv){
+  var newData = new Map();
+  csv.forEach(function(d) {
+    if (d.gas === "KYOTOGHG" && d.sector === "Total excluding LULUCF" && !(COUNTRY_BIG_CATEGS.includes(d.country))) {
+      var value = +d["value (MtCO2e)"];
+      if (d.country in newData){
+        value += newData.get(d.country);
+      }
+      newData.set(d.country, value);
+    }
+  })
+  console.log(newData);
   return newData;
 }
 
@@ -85,7 +121,7 @@ function drawTheMap(world, yearData){
   .data(world.features)
   .join("path")
     // draw each country
-    .attr("d", d3.geoPath()
+    .attr("d", path
       .projection(projection)
     )
     // set the color of each country
@@ -93,4 +129,16 @@ function drawTheMap(world, yearData){
       d.total = yearData.get(d.id) || 0;
       return colorScale(d.total);
     })
+
+  /*
+  zoom TODO not working yet
+  var g = svg.append("g");
+  var zoom = d3.zoom()
+      .scaleExtent([1, 8])
+      .on('zoom', function(event) {
+          g.selectAll('path')
+           .attr('transform', event.transform);
+  });
+  svg.call(zoom);
+  */
 }

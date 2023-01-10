@@ -31,7 +31,7 @@ d3.csv("../data/CW_emissions.csv", d => {
 
 const createLineChart = (data, color) => {
   // Set the dimensions and margins of the graph
-  const width = 900, height = 400;
+  const width = 500, height = 300;
   const margins = {top: 20, right: 100, bottom: 80, left: 60};
 
   // Create the SVG container
@@ -95,8 +95,8 @@ const createLineChart = (data, color) => {
       .attr('x', width - margins.right + 5)
       .attr('y', d => yScale(d.value))
       .attr('dy', '0.35em')
+      .style('font-size', '7px')
       .style('font-family', 'sans-serif')
-      .style('font-size', 10)
       .style('fill', d => color(d.country))
     .text(d => d.country);
   
@@ -106,6 +106,7 @@ const createLineChart = (data, color) => {
     .attr("text-anchor", "end")
     .attr("x", width-100)
     .attr("y", height-40)
+    .style('font-size', '12px')
     .text("Year");
   
   // y label
@@ -114,6 +115,8 @@ const createLineChart = (data, color) => {
     .attr("text-anchor", "end")
     .attr("y", 0)
     .attr("dy", ".75em")
+    .attr("x", -margins.top)
     .attr("transform", "rotate(-90)")
-    .text("GHG emissions value (MtCO2e)");
+    .text("GHG emissions value (MtCO2e)")
+    .style('font-size', '12px');
 }
