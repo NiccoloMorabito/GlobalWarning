@@ -1,48 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <meta name="description" content="" />
+  <meta name="author" content="" />
 	<title>Global Warning</title>
+
+  <!-- Favicon-->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+  <!-- Font Awesome icons (free version)-->
+  <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+  <!-- Google fonts-->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css" />
+  <link href="https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" type="text/css" href="css/main.css">
+  <link rel="stylesheet" type="text/css" href="css/styles-bs.css" >
 </head>
 
-<body>
+<body id="page-top">
 
 
-  <h1 class="center"> GHG emissions per country per year </h1>
+  <!-- Navigation
+  <nav class="navbar navbar-expand-lg bg-secondary text-uppercase fixed-top" id="mainNav">
+      <div class="container">
+          <a class="navbar-brand" href="#page-top">Global Warning</a>
+          <button class="navbar-toggler text-uppercase font-weight-bold bg-primary text-white rounded" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+              Menu
+              <i class="fas fa-bars"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarResponsive">
+              <ul class="navbar-nav ms-auto">
+                  <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#portfolio">Visualizations</a></li>
+                  <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#about">About</a></li>
+              </ul>
+          </div>
+      </div>
+  </nav>
+  -->
 
+  <!-- Masthead-->
+  <header class="masthead bg-primary text-white text-center">
+      <div class="container d-flex align-items-center flex-column">
+          <!-- Masthead Heading-->
+          <h1 class="masthead-heading text-uppercase mb-0">Global Warning</h1>
+          <!-- Icon Divider-->
+          <div class="divider-custom divider-light">
+              <div class="divider-custom-line"></div>
+              <!--
+              <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+              <div class="divider-custom-line"></div>
+              -->
+          </div>
+          <!-- Masthead Subheading-->
+          <p class="masthead-subheading font-weight-light mb-0">Visual Analytics Project - 2022/2023</p>
+      </div>
+  </header>
 
+  <!-- Visualizations Section-->
+  <section class="page-section portfolio" id="portfolio">
+      <div class="container">
+          <!-- Portfolio Section Heading-->
+          <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">Visualizations</h2>
+          <!-- Icon Divider-->
+          <div class="divider-custom">
+              <div class="divider-custom-line"></div>
+              <!--
+              <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+              <div class="divider-custom-line"></div>
+              -->
+          </div>
 
+          <!-- Map -->
+          <div id="map" class="responsive-svg-container">
+            <h3 class="center"> GHG emissions per country per year </h3>
+          </div>
+          
+          <div class="slidecontainer" >
+            <input type="range" id="yearSlider" min="1850" max="2019" step="1" value="1850" class="slider">
+            <br>
+            <input type="checkbox" id="allYearsCheckbox" value="unchecked"/> All years
+            <p> Year: <span id="demo"></span></p>
+          </div>
+
+          <!-- Linechart -->
+          <div id="line" class="responsive-svg-container">
+            <h3> GHG Emissions per geographical category during time </h3>
+          </div>
+
+      </div>
+  </section>
+  
+  <!-- About Section-->
+  <section class="page-section bg-primary text-white mb-0" id="about">
+      <div class="container">
+          <!-- About Section Heading-->
+          <h2 class="page-section-heading text-center text-uppercase text-white">About</h2>
+          <!-- Icon Divider-->
+          <div class="divider-custom divider-light">
+              <div class="divider-custom-line"></div>
+              <!--
+              <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+              <div class="divider-custom-line"></div>
+              -->
+          </div>
+          <!-- About Section Content-->
+          <div class="row">
+              <div class="col-lg-4 ms-auto"><p class="lead">The final aim of this object is to study the relation between the consequences of climate change (in terms of the number and frequency of natural disasters and extreme weather and temperature events) and the emissions of GHG all around the world in the last 100 years.</p></div>
+              <div class="col-lg-4 me-auto"><p class="lead">Currently, the visualizations in this website only focus on the GHG emissions during time and they do not include the data about natural disasters and extreme weather events, that will be added soon</p></div>
+          </div>
+      </div>
+  </section>
+
+  <!-- Footer
+  <footer class="footer text-center">
+      <div class="container">
+          <div class="row">
+              <div class="col-lg-4 mb-5 mb-lg-0">
+                  <h4 class="text-uppercase mb-4">Location</h4>
+                  <p class="lead mb-0">
+                      2215 John Daniel Drive
+                      <br />
+                      Clark, MO 65243
+                  </p>
+              </div>
+              <div class="col-lg-4 mb-5 mb-lg-0">
+                  <h4 class="text-uppercase mb-4">Around the Web</h4>
+                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-facebook-f"></i></a>
+                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-twitter"></i></a>
+                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-linkedin-in"></i></a>
+                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-dribbble"></i></a>
+              </div>
+              <div class="col-lg-4">
+                  <h4 class="text-uppercase mb-4">About Freelancer</h4>
+                  <p class="lead mb-0">
+                      Freelance is a free to use, MIT licensed Bootstrap theme created by
+                      <a href="http://startbootstrap.com">Start Bootstrap</a>
+                      .
+                  </p>
+              </div>
+          </div>
+      </div>
+  </footer>
+  -->
+  
+  <!-- Copyright Section-->
+  <div class="copyright py-4 text-center text-white">
+      <div class="container"><small>Developed by Niccolò Morabito</small></div>
+  </div>
+  
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/bs-script.js"></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="js/choropleth-map.js"></script>
   <script src="js/linechart.js"></script>
-
-  <div class="slidecontainer" >
-    <input type="range" id="yearSlider" min="1850" max="2019" step="1" value="1850" class="slider">
-    <br>
-    <input type="checkbox" id="allYearsCheckbox" value="unchecked"/> All years
-    <p> Year: <span id="demo"></span></p>
-  </div>
-  
-
-  <script>
-    var slider = document.getElementById("yearSlider");
-    var output = document.getElementById("demo");
-    output.innerHTML = slider.value;
-
-    slider.oninput = function() {
-      output.innerHTML = this.value;
-    }
-
-  </script>
-
-
-	<div id="line"class="responsive-svg-container">
-    <h1> GHG Emissions per geographical categories during time </h1>
-  </div>
-  
 
 </body>
 </html>

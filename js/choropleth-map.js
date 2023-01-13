@@ -6,7 +6,8 @@ const EMS_QUANTILES = [0, 50, 250, 1000, 5000, 10000]
 // stuff
 var width = 960,
     height = 500;
-var svg = d3.select("body").append("svg")
+
+var svg = d3.select("#map").append("svg")
   .attr("viewBox", [0, 0, width, height]);
 const path = d3.geoPath();
 const projection = d3.geoMercator()
@@ -16,6 +17,14 @@ const projection = d3.geoMercator()
 const colorScale = d3.scaleThreshold()
   .domain(EMS_QUANTILES)
   .range(d3.schemeBlues[EMS_QUANTILES.length]);
+
+var slider = document.getElementById("yearSlider");
+var output = document.getElementById("demo");
+output.innerHTML = slider.value;
+
+slider.oninput = function() {
+  output.innerHTML = this.value;
+}
 
 // legend
 var legendData = [];
