@@ -89,7 +89,6 @@ legend.append("text")
     .text("GHG emissions value (MtCO2e)");
 
 
-// data
 Promise.all([
   d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
   d3.csv("../data/CW_emissions.csv", d => d),
@@ -100,39 +99,35 @@ Promise.all([
   const disastersCsv = promises[2];
 
   // first map with the first year
-  var yearData = emissionsDataForYear(emissionsCsv, START_YEAR);
-  var prova = disastersDataForYear(disastersCsv, 2000);
-  drawMap(world, yearData, prova);
+  var emissionsYearData = getEmissionsDataForYear(emissionsCsv, START_YEAR);
+  var disastersYearData = getDisastersDataForYear(disastersCsv, START_YEAR);
+  drawMap(world, emissionsYearData, disastersYearData);
 
+  // year selection
   d3.select("#yearSlider")
     .on("change", function() {
       d3.select("#allYearsCheckbox").property('checked', false);
 
       var yearInput = +d3.select(this).node().value;
-      var yearData = emissionsDataForYear(emissionsCsv, yearInput);
-      updateMap(yearData);
+      emissionsYearData = getEmissionsDataForYear(emissionsCsv, yearInput);
+      disastersYearData = getDisastersDataForYear(disastersCsv, yearInput);
+      updateMap(emissionsYearData, disastersYearData);
     });
 
   // animation button
   d3.select("#animationButton").on("click", function() {
-    console.log("cliccato porcoddio");
     toggleAnimationButton();
-
-    // starting from beginning
-    yearData = emissionsDataForYear(emissionsCsv, START_YEAR);
-    updateMap(yearData);
-    d3.select("#yearText").text(START_YEAR);
-    d3.select("#yearSlider").property('value', START_YEAR);
     
-    let y = START_YEAR;
-    let timer = setInterval(function() {
+    var y = START_YEAR;
+    var timer = setInterval(function() {
       if (y > END_YEAR){
         clearInterval(timer);
         toggleAnimationButton();
       }
       else {
-        yearData = emissionsDataForYear(emissionsCsv, y);
-        updateMap(yearData);
+        emissionsYearData = getEmissionsDataForYear(emissionsCsv, y);
+        disastersYearData = getDisastersDataForYear(disastersCsv, y);
+        updateMap(emissionsYearData, disastersYearData);
         d3.select("#yearText").text(y);
         d3.select("#yearSlider").property('value', y);
         y += 1;
@@ -148,75 +143,75 @@ function toggleAnimationButton() {
   classList.toggle(pauseIconClassName);
 }
 
-function drawMap(world, yearData, disastersYearData){
-  gMap
-  .selectAll("path")
-  .data(world.features)
-  .join("path")
-    // draw each country
-    .attr("d", path
-      .projection(projection)
-    )
-    // set the color of each country
-    .attr("fill", function (d) {
-      d.total = yearData.get(d.id) || 0;
-      return colorScale(d.total);
-    });
+function drawMap(world, emissionsYearData, disastersYearData){
+  // color countries
+  gMap.selectAll("path")
+    .data(world.features)
+    .join("path")
+      // draw each country
+      .attr("d", path
+        .projection(projection)
+      )
+      // set the color of each country
+      .attr("fill", function (d) {
+        d.total = emissionsYearData.get(d.id) || 0;
+        return colorScale(d.total);
+      });
 
+  // plot circles for disasters
   gMap.selectAll("circle")
-  .data(disastersYearData)
-  .enter().append("circle")
-  .attr("r", 5)
-  .attr("cx", function(d) {
-    return projection([d.Longitude, d.Latitude])[0];
-  })
-  .attr("cy", function(d) {
-    return projection([d.Longitude, d.Latitude])[1];
-  })
-  .style("stroke", "#42B7B2")
-  //.style("stroke-width", "4px")
-  .style("fill", "none");
+    .data(disastersYearData)
+    .enter().append("circle")
+    .attr("r", 5)
+    .attr("cx", function(d) {
+      return projection([d.Longitude, d.Latitude])[0];
+    })
+    .attr("cy", function(d) {
+      return projection([d.Longitude, d.Latitude])[1];
+    })
+    .style("stroke", "#42B7B2")
+    //.style("stroke-width", "4px")
+    .style("fill", "none");
   
   gMap
     .call(zoom);
-    //.call(zoom.transform, d3.zoomIdentity.translate(-500, -250).scale(2));
-
 }
 
-function updateMap(yearData){
-  gMap
-    .selectAll("path")
+function updateMap(emissionsYearData, disastersYearData){
+  // color countries
+  gMap.selectAll("path")
       // set the color of each country
       .attr("fill", function (d) {
-        d.total = yearData.get(d.id) || 0;
+        d.total = emissionsYearData.get(d.id) || 0;
         return colorScale(d.total);
       });
+
+  // plot circles for disasters
+  gMap.selectAll("circle")
+    .remove()
+    .data(disastersYearData)
+    .enter().append("circle")
+    .attr("r", 5)
+    .attr("cx", function(d) {
+      return projection([d.Longitude, d.Latitude])[0];
+    })
+    .attr("cy", function(d) {
+      return projection([d.Longitude, d.Latitude])[1];
+    })
+    .style("stroke", "#42B7B2")
+    //.style("stroke-width", "4px")
+    .style("fill", "none");
 }
 
 
 /*
 FUNCTIONS FOR EMISSIONS CSV
 */
-function emissionsDataForYear(emissionsCsv, year){
+function getEmissionsDataForYear(emissionsCsv, year){
   var newData = new Map();
   emissionsCsv.forEach(function(d) {
     if (okForEmissionsData(d) && +d.year === year) {
       newData.set(d.country, +d["value (MtCO2e)"]);
-    }
-  })
-  return newData;
-}
-
-//TODO DELETE!
-function emissionsDataForAllYears(emissionsCsv){
-  var newData = new Map();
-  emissionsCsv.forEach(function(d) {
-    if (okForEmissionsData(d)) {
-      var value = +d["value (MtCO2e)"];
-      if (d.country in newData){
-        value += newData.get(d.country);
-      }
-      newData.set(d.country, value);
     }
   })
   return newData;
@@ -229,8 +224,7 @@ function okForEmissionsData(row) {
 /*
 FUNCTIONS FOR DISASTERS CSV
 */
-//TODO change names
-function disastersDataForYear(disastersCsv, year) {
+function getDisastersDataForYear(disastersCsv, year) {
   var newData = [];
   disastersCsv.forEach(function(d) {
     if (+d.Year === year) {
