@@ -11,12 +11,12 @@
 }
 .slidecontainer {
     margin: auto;
-    width: 50%;
+    width: 65%;
 }
 
 .slider {
     -webkit-appearance: none;
-    width: 100%;
+    width: 85%;
     height: 10px;
     background: #d3d3d3;
     outline: none;

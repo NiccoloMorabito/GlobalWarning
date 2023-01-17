@@ -16,9 +16,6 @@ d3.csv("../data/CW_emissions.csv", d => {
   newData = data.filter(d => d.gas === "KYOTOGHG")
       .filter(d => d.sector === "Total excluding LULUCF")
       .filter(d => BIG_CATEGS.includes(d.country) );
-  console.log(data.length);
-  console.log(newData.length);
-  console.log(newData);
 
   const countries = data.map(d => d.country);
   const color = d3.scaleOrdinal()
@@ -39,15 +36,11 @@ const createLineChart = (data, color) => {
     .append("svg")
     .attr("viewBox", [0, 0, width, height]);
 
-  console.log(data);
 
   // Define x-axis, y-axis, and color scales
   const yScale = d3.scaleLinear()
     .domain([0, d3.max(data, d=>d.value)])
     .range([height - margins.bottom, margins.top]);
-  console.log(yScale(0.0001))
-  console.log(yScale(2000))
-  console.log(yScale(10000000))
 
   const xScale = d3.scaleTime()
     .domain(d3.extent(data, d => d.date))
@@ -60,7 +53,6 @@ const createLineChart = (data, color) => {
 
   // Group the data for each big category
   const group = d3.group(data, d => d.country);
-  console.log(group);
 
   // Create line paths for each country
   const path = svg.selectAll('path')
