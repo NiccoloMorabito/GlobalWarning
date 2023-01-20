@@ -1,11 +1,27 @@
 // source: https://d3-graph-gallery.com/graph/barplot_grouped_basicWide.html
 
+//TODO fix these descriptions
+const DISASTER_TYPE_TO_DESCRIPTION = new Map(
+  [["Biological", "A hazard caused by the exposure to living organisms and their toxic substances (e.g. venom, mold) or vector-borne \
+  diseases that they may carry. Examples are venomous wildlife and insects, poisonous plants, and mosquitoes carrying \
+  disease-causing agents.\n\
+  Main types: Epidemic, Insect infestation, Animal Accident"], //TODO remove Animal Accident?
+  ["Climatological", "A hazard caused by long-lived, meso- to macro-scale atmospheric processes ranging from intra-seasonal to \
+  multi-decadal climate variability. \n\
+  Main types: Drought, Glacial Lake Outburst, Wildfire."],
+  ["Hydrological", "A hazard caused by the occurrence, movement, and distribution of surface and subsurface freshwater and saltwater.\n\
+  Main types: Flood, Landslide, Wave action."],
+  ["Meteorological", "A hazard caused by short-lived, micro- to meso-scale extreme weather and atmospheric conditions that last from \
+  minutes to days. Main types: Extreme Temperature and Storm."]
+]);
+
+
 // Parse the Data //TODO if you load the same file twice, call this function from the main script
 d3.csv("../data/EMDAT_disasters_barchart.csv").then( function(data) {
     // set the dimensions and margins of the graph
     const margin = {top: 10, right: 30, bottom: 20, left: 50},
-        width = 460 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
+        width = 600,
+        height = 300;
     
     // append the barSvg object to the body of the page
     const barSvg = d3.select("#bar")
@@ -41,8 +57,8 @@ d3.csv("../data/EMDAT_disasters_barchart.csv").then( function(data) {
   const x = d3.scaleBand()
       .domain(groups)
       .range([0, width])
-      .padding([0.2])
-      barSvg.append("g")
+      .padding([0.2]);
+  barSvg.append("g")
     .attr("transform", `translate(0, ${height})`)
     .call(d3.axisBottom(x).tickSize(0));
 
@@ -71,6 +87,9 @@ d3.csv("../data/EMDAT_disasters_barchart.csv").then( function(data) {
     .data(data)
     .join("g")
       .attr("transform", d => `translate(${x(d["Disaster Subgroup"])}, 0)`)
+      .on("mouseover", mouseoverBar)
+      .on("mousemove", mousemoveBar)
+      .on("mouseout", mouseoutBar)
     .selectAll("rect")
     .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
     .join("rect")
@@ -117,4 +136,52 @@ d3.csv("../data/EMDAT_disasters_barchart.csv").then( function(data) {
         return d;
     });
 
+  // y label
+  barSvg.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", -50)
+    .attr("dy", ".75em")
+    .attr("x", -margin.top)
+    .attr("transform", "rotate(-90)")
+    .text("Frequency")
+    .style('font-size', '15px');
+
 })
+
+function mouseoverBar() {
+  // make the other bars more transparent
+  d3.selectAll('g > rect')
+    .style("opacity", 0.5)
+
+  // highlight the selected bar
+  d3.select(this).selectAll('rect')
+    .style("opacity", 1)
+    .style("stroke", "black")
+    .style("stroke-width", 2)
+
+  // add tooltip
+  Tooltip
+    .style("opacity", 1)
+}
+
+function mousemoveBar(event, d) {
+  Tooltip    
+    .html(DISASTER_TYPE_TO_DESCRIPTION.get(d["Disaster Subgroup"]))
+    .style("left", (event.pageX+30) + "px")
+    .style("top", (event.pageY) + "px")
+}
+
+function mouseoutBar() {
+  // make all the bars visible again
+  d3.selectAll('rect')
+    .style("opacity", 1)
+
+  // undo the highlight of the selected bar
+  d3.select(this).selectAll('rect')
+    .style("stroke-width", null);
+
+  // remove the tooltip
+  Tooltip
+    .style("opacity", 0)
+}
