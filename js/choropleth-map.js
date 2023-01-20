@@ -1,5 +1,8 @@
+// source (TODO delete) https://d3-graph-gallery.com/graph/bubblemap_template.html
+//TODO put the zoom buttons inside the map
+
 const COUNTRY_BIG_CATEGS = ["WORLD", "ANNEXI", "NONANNEXI", "BASIC", "UMBRELLA", "EUU", "LDC", "AOSIS"]
-const START_YEAR = 1850;
+const START_YEAR = 1900; //1850 without disasters
 const END_YEAR = 2019;
 
 // max value per year per country: 13000
@@ -7,19 +10,23 @@ const EMS_QUANTILES = [0, 50, 250, 1000, 5000, 10000]
 
 const pauseIconClassName = 'fa-circle-pause'
 const playIconClassName = 'fa-circle-play'
+const countryColorScale = d3.scaleThreshold()
+  .domain(EMS_QUANTILES)
+  .range(d3.schemeOranges[EMS_QUANTILES.length]);
 
 // stuff
 var width = 960,
     height = 650;
 
-var svg = d3.select("#map").append("svg")
+var svgMap = d3.select("#map").append("svg")
   .attr("viewBox", [0, 0, width, height]);
 const path = d3.geoPath();
 const projection = d3.geoMercator()
   .scale(140)
   .center([0,20])
   .translate([width / 2, height / 2 + 80]);
-const gMap = svg.append("g");
+const gMap = svgMap.append("g");
+
 const zoom = d3.zoom()
 .scaleExtent([1, 8])
 .translateExtent([[0, 0], [width, height]])
@@ -33,9 +40,13 @@ const zoom = d3.zoom()
     .attr("transform", event.transform);
 });
 
-const colorScale = d3.scaleThreshold()
-  .domain(EMS_QUANTILES)
-  .range(d3.schemeBlues[EMS_QUANTILES.length]);
+// zoom buttons
+d3.select("#zoom_in").on("click", function() {
+  zoom.scaleBy(svgMap.transition().duration(500), 1.2);
+});
+d3.select("#zoom_out").on("click", function() {
+  zoom.scaleBy(svgMap.transition().duration(500), 0.8);
+});
 
 var slider = document.getElementById("yearSlider");
 var output = document.getElementById("yearText");
@@ -45,18 +56,20 @@ slider.oninput = function() {
   output.innerHTML = this.value;
 }
 
+
 // legend TODO fix the background
 var legendData = [];
 EMS_QUANTILES.forEach(q => {
   legendData.push({"size": EMS_QUANTILES.indexOf(q)*10, "value": q})
 });
-var legend = svg.append("g")
+var legend = svgMap.append("g")
     .attr("class", "legend")
     .attr("transform", "translate(" + (width - 70) + "," + (height - 20) + ")")
     .selectAll("g")
     .data(legendData)
     .enter().append("g");
 
+// background rect
 legend.append('rect')
   .attr('x', -80)
   .attr('y', -140)
@@ -69,7 +82,7 @@ legend.append('rect')
 
 legend.append("rect")
     .style("fill", function(d, i) {
-      return colorScale(d.value)
+    return countryColorScale(d.value)
     })
     .attr("x", 15)
     .attr("y", function(d, i) {
@@ -79,9 +92,10 @@ legend.append("rect")
     .attr("height", 18);
 
 legend.append("text")
+  .attr("x", -10)
     .attr("y", function(d){return -2*+d.size-4})
     .attr("dy", "1.3em")
-    .text(function(d) {return d.value});
+  .text(function(d) {return d.value + "+"});
 
 legend.append("text")
     .attr("x", -5)
@@ -132,15 +146,15 @@ Promise.all([
         d3.select("#yearSlider").property('value', y);
         y += 1;
       }
-    }, 100);
+    }, 250);
   });
 });
 
 function toggleAnimationButton() {
   //TODO this method makes the button non-clickable anymore
-  let classList = document.getElementById("animationButton").classList;
-  classList.toggle(playIconClassName);
-  classList.toggle(pauseIconClassName);
+  let button = document.getElementById("animationButton");
+  button.classList.toggle(playIconClassName);
+  button.classList.toggle(pauseIconClassName);
 }
 
 function drawMap(world, emissionsYearData, disastersYearData){
@@ -155,7 +169,7 @@ function drawMap(world, emissionsYearData, disastersYearData){
       // set the color of each country
       .attr("fill", function (d) {
         d.total = emissionsYearData.get(d.id) || 0;
-        return colorScale(d.total);
+        return countryColorScale(d.total);
       });
 
   // plot circles for disasters
@@ -173,8 +187,7 @@ function drawMap(world, emissionsYearData, disastersYearData){
     //.style("stroke-width", "4px")
     .style("fill", "none");
   
-  gMap
-    .call(zoom);
+  gMap.call(zoom);
 }
 
 function updateMap(emissionsYearData, disastersYearData){
@@ -183,12 +196,15 @@ function updateMap(emissionsYearData, disastersYearData){
       // set the color of each country
       .attr("fill", function (d) {
         d.total = emissionsYearData.get(d.id) || 0;
-        return colorScale(d.total);
+        return countryColorScale(d.total);
       });
 
   // plot circles for disasters
   gMap.selectAll("circle")
-    .remove()
+    .remove();
+
+  gMap
+    .selectAll("circle")
     .data(disastersYearData)
     .enter().append("circle")
     .attr("r", 5)

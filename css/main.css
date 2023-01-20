@@ -67,3 +67,51 @@ div.tooltip {
 .center {
   text-align: center;
 }
+
+.unzoom-button {
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  user-select: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-collapse: collapse;
+  width: 32px;
+  height: 32px;
+  text-align: center;
+  cursor: pointer;
+  line-height: 32px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  z-index: 100;
+  background-size: 12px 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 2'%3E%3Cpath d='M11.8 2H.2a.215.215 0 0 1-.2-.2V.2A.215.215 0 0 1 .2 0h11.6a.215.215 0 0 1 .2.2v1.6a.215.215 0 0 1-.2.2z' fill='%2383888d'/%3E%3C/svg%3E");
+  background-color: #fff;
+  box-shadow: rgba(0,0,0,.16) 0 0 4px;
+}
+
+.zoom-button {
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+  user-select: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-collapse: collapse;
+  width: 32px;
+  height: 32px;
+  text-align: center;
+  cursor: pointer;
+  line-height: 32px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  z-index: 100;
+  background-size: 12px 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M7 4.8V.2a.215.215 0 0 0-.2-.2H5.2a.215.215 0 0 0-.2.2v4.6a.215.215 0 0 1-.2.2H.2a.215.215 0 0 0-.2.2v1.6a.215.215 0 0 0 .2.2h4.6a.215.215 0 0 1 .2.2v4.6a.215.215 0 0 0 .2.2h1.6a.215.215 0 0 0 .2-.2V7.2a.215.215 0 0 1 .2-.2h4.6a.215.215 0 0 0 .2-.2V5.2a.215.215 0 0 0-.2-.2H7.2a.215.215 0 0 1-.2-.2z' fill='%2383888d'/%3E%3C/svg%3E");
+  position: relative;
+  background-color: #fff;
+  box-shadow: rgba(0,0,0,.16) 0 0 4px;
+}
+
