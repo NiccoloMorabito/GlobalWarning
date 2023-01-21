@@ -1,7 +1,9 @@
 // source (TODO delete) https://d3-graph-gallery.com/graph/bubblemap_template.html
 //TODO put the zoom buttons inside the map
+//TODO put the legend(s) outside the map
 
 const COUNTRY_BIG_CATEGS = ["WORLD", "ANNEXI", "NONANNEXI", "BASIC", "UMBRELLA", "EUU", "LDC", "AOSIS"]
+const EXCLUDED_DIS_TYPES = ["Fog", "Insect infestation"]
 const START_YEAR = 1900; //1850 without disasters
 const END_YEAR = 2019;
 
@@ -25,20 +27,41 @@ const projection = d3.geoMercator()
   .scale(140)
   .center([0,20])
   .translate([width / 2, height / 2 + 80]);
+
 const gMap = svgMap.append("g");
 
+//var currentZoomScale = 1;
 const zoom = d3.zoom()
-.scaleExtent([1, 8])
-.translateExtent([[0, 0], [width, height]])
-.on('zoom', function zoomed(event) {
-  // zoom color countries
-  gMap.selectAll('path')
-    .attr('transform', event.transform);
+  .scaleExtent([1, 8])
+  .translateExtent([[0, 0], [width, height]])
+  .on('zoom', function zoomed(event) {
+    //console.log(d3.zoomTransform(this).k);
+    //currentZoomScale = event.transform.k;
 
-  // zoom circles for diasters
-  gMap.selectAll('circle')
-    .attr("transform", event.transform);
-});
+    // zoom color countries
+    gMap.selectAll('path.countriesColor')
+      .attr('transform', event.transform);
+
+    //zoom disaster
+    gMap.selectAll('image.disaster')
+      //.each(function(d, i) { console.log(+d.Longitude, +d.Latitude); });
+      .attr("transform", event.transform);
+    
+/*
+source for this https://stackoverflow.com/questions/34323318/d3-us-state-map-with-markers-zooming-transform-issues
+    gMap.selectAll('image.disaster')
+      .attr('transform', function(){
+        translate = d3.select(this).attr("transform");
+        translate0 = parseFloat(translate.split("(")[1].split(",")[0]);
+        //translate0 -= event.transform.x / event.transform.k;
+        translate1 = parseFloat(translate.split(",")[1].trim(")"));
+        //translate1 -= event.transform.y / event.transform.k;
+        //return "translate(" + translate0 + ", 0) scale(" + event.transform.k + ")";
+        return "translate(" + translate0 +","+ translate1 + ")scale("+1/event.transform.k+")";
+      });
+    //  `translate(${projection([+d.Longitude, +d.Latitude])[0]}, ${projection([+d.Longitude, +d.Latitude])[1]})`
+    */
+  });
 
 // zoom buttons
 d3.select("#zoom_in").on("click", function() {
@@ -58,19 +81,19 @@ slider.oninput = function() {
 
 
 // legend TODO fix the background
-var legendData = [];
+var quantilesForLegend = [];
 EMS_QUANTILES.forEach(q => {
-  legendData.push({"size": EMS_QUANTILES.indexOf(q)*10, "value": q})
+  quantilesForLegend.push({"size": EMS_QUANTILES.indexOf(q)*10, "value": q})
 });
-var legend = svgMap.append("g")
+var legendContryColor = svgMap.append("g")
     .attr("class", "legend")
     .attr("transform", "translate(" + (width - 70) + "," + (height - 20) + ")")
     .selectAll("g")
-    .data(legendData)
+    .data(quantilesForLegend)
     .enter().append("g");
 
 // background rect
-legend.append('rect')
+legendContryColor.append('rect')
   .attr('x', -80)
   .attr('y', -140)
   .attr('width', 400) //TODO change these values, they go outside of the borders
@@ -80,27 +103,27 @@ legend.append('rect')
   .attr('fill', 'grey')
   .attr('fill-opacity', 0.1);
 
-legend.append("rect")
-    .style("fill", function(d, i) {
+legendContryColor.append("rect")
+  .style("fill", function(d, i) {
     return countryColorScale(d.value)
-    })
-    .attr("x", 15)
-    .attr("y", function(d, i) {
-      return - 2 - EMS_QUANTILES.indexOf(d.value)*20
-    })
-    .attr("width", 18)
-    .attr("height", 18);
+  })
+  .attr("x", 15)
+  .attr("y", function(d, i) {
+    return - 2 - EMS_QUANTILES.indexOf(d.value)*20
+  })
+  .attr("width", 18)
+  .attr("height", 18);
 
-legend.append("text")
+legendContryColor.append("text")
   .attr("x", -10)
-    .attr("y", function(d){return -2*+d.size-4})
-    .attr("dy", "1.3em")
+  .attr("y", function(d){return -2*+d.size-4})
+  .attr("dy", "1.3em")
   .text(function(d) {return d.value + "+"});
 
-legend.append("text")
-    .attr("x", -5)
-    .attr("y", - EMS_QUANTILES.length*20)
-    .text("GHG emissions value (MtCO2e)");
+legendContryColor.append("text")
+  .attr("x", -5)
+  .attr("y", - EMS_QUANTILES.length*20)
+  .text("GHG emissions value (MtCO2e)");
 
 
 Promise.all([
@@ -111,6 +134,19 @@ Promise.all([
   const world = promises[0];
   const emissionsCsv = promises[1];
   const disastersCsv = promises[2];
+  /*
+  disasterColors = d3.scaleOrdinal()
+    .domain(disastersCsv.map(d => d["Disaster Type"])) some of the types are then excluded
+    .range(d3.schemeTableau10);
+  disasterShapes = d3.scaleOrdinal(
+    disastersCsv.map(d => d["Disaster Type"]),
+    d3.symbols.map(s => d3.symbol().type(s)())
+  )
+  //TODO there are 7 symbols and 10 disaster types
+  console.log(d3.symbols);
+  console.log(new Set(disastersCsv.map(d => d["Disaster Type"])));
+  */
+  
 
   // first map with the first year
   var emissionsYearData = getEmissionsDataForYear(emissionsCsv, START_YEAR);
@@ -155,6 +191,7 @@ function toggleAnimationButton() {
   let button = document.getElementById("animationButton");
   button.classList.toggle(playIconClassName);
   button.classList.toggle(pauseIconClassName);
+  //button.disabled = true
 }
 
 function drawMap(world, emissionsYearData, disastersYearData){
@@ -162,61 +199,64 @@ function drawMap(world, emissionsYearData, disastersYearData){
   gMap.selectAll("path")
     .data(world.features)
     .join("path")
+    .attr("class", "countriesColor")
       // draw each country
-      .attr("d", path
-        .projection(projection)
-      )
+      .attr("d", path.projection(projection))
       // set the color of each country
       .attr("fill", function (d) {
         d.total = emissionsYearData.get(d.id) || 0;
         return countryColorScale(d.total);
       });
 
-  // plot circles for disasters
-  gMap.selectAll("circle")
-    .data(disastersYearData)
-    .enter().append("circle")
-    .attr("r", 5)
-    .attr("cx", function(d) {
-      return projection([d.Longitude, d.Latitude])[0];
-    })
-    .attr("cy", function(d) {
-      return projection([d.Longitude, d.Latitude])[1];
-    })
-    .style("stroke", "#42B7B2")
-    //.style("stroke-width", "4px")
-    .style("fill", "none");
+  // plot icons for disasters
+  gMap.selectAll("circles")
+    .data(disastersYearData) //.sort((a,b) => +b.n - +a.n).filter((d,i) => i<1000))
+    .enter().append("image")
+    .attr("class", "disaster")
+    //.attr("d", d => disasterShapes(d["Disaster Type"]))
+    .attr("xlink:href", 'icons/drought.png')
+    .attr("width", "10px")
+    .attr("height", "10px")
+    //.attr("transform",
+    //  d => `translate(${projection([+d.Longitude, +d.Latitude])})`
+    //)
+    .attr("x", function(d){ return projection([+d.Longitude, +d.Latitude])[0]})
+    .attr("y", function(d){ return projection([+d.Longitude, +d.Latitude])[1]})
+    //.attr("fill", d => disasterColors(d["Disaster Type"]));
   
   gMap.call(zoom);
 }
 
 function updateMap(emissionsYearData, disastersYearData){
   // color countries
-  gMap.selectAll("path")
-      // set the color of each country
-      .attr("fill", function (d) {
-        d.total = emissionsYearData.get(d.id) || 0;
-        return countryColorScale(d.total);
-      });
+  gMap.selectAll("path.countriesColor")
+    .attr("fill", function (d) {
+      d.total = emissionsYearData.get(d.id) || 0;
+      return countryColorScale(d.total);
+    });
 
-  // plot circles for disasters
-  gMap.selectAll("circle")
+  // remove previous disasters
+  gMap.selectAll("image.disaster")
     .remove();
 
-  gMap
-    .selectAll("circle")
+  // plot shapes for disasters
+  gMap.selectAll("circles")
     .data(disastersYearData)
-    .enter().append("circle")
-    .attr("r", 5)
-    .attr("cx", function(d) {
-      return projection([d.Longitude, d.Latitude])[0];
-    })
-    .attr("cy", function(d) {
-      return projection([d.Longitude, d.Latitude])[1];
-    })
-    .style("stroke", "#42B7B2")
-    //.style("stroke-width", "4px")
-    .style("fill", "none");
+    .enter().append("image")
+    .attr("class", "disaster")
+    //.attr("d", d => disasterShapes(d["Disaster Type"]))
+    .attr("xlink:href", d => `icons/${d['Disaster Type']}.png`)
+    .attr("width", "10px")
+    .attr("height", "10px")
+    //.attr("transform",
+    //  d => `translate(${projection([+d.Longitude, +d.Latitude])})`
+    //)
+    .attr("x", function(d){ return projection([+d.Longitude, +d.Latitude])[0]})
+    .attr("y", function(d){ return projection([+d.Longitude, +d.Latitude])[1]})
+    //.attr("fill", "blue"); //d => disasterColors(d["Disaster Type"])) //TODO decide whether to keep only colour
+
+  //TODO still problem on the disasters when changing year and the map is zoomed
+  gMap.call(zoom.transform, d3.zoomIdentity); // temp. solution (zooming out everytime the map is updated)
 }
 
 
@@ -243,7 +283,7 @@ FUNCTIONS FOR DISASTERS CSV
 function getDisastersDataForYear(disastersCsv, year) {
   var newData = [];
   disastersCsv.forEach(function(d) {
-    if (+d.Year === year) {
+    if (+d.Year === year && !(EXCLUDED_DIS_TYPES.includes(d["Disaster Type"]))) {
       newData.push(d)
     }
   })
