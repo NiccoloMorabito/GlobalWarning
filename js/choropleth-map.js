@@ -209,7 +209,7 @@ function drawMap(world, emissionsYearData, disastersYearData){
       });
 
   // plot icons for disasters
-  gMap.selectAll("circles")
+  gMap.selectAll("image.disaster")
     .data(disastersYearData) //.sort((a,b) => +b.n - +a.n).filter((d,i) => i<1000))
     .enter().append("image")
     .attr("class", "disaster")
@@ -228,22 +228,36 @@ function drawMap(world, emissionsYearData, disastersYearData){
 }
 
 function updateMap(emissionsYearData, disastersYearData){
+  const colorTransition = d3.transition()
+    .ease(d3.easeCubic)
+    .duration(400);
+  
+  const disastersTransition = d3.transition()
+    .ease(d3.easeLinear)
+    .duration(100);
+
   // color countries
   gMap.selectAll("path.countriesColor")
+    .transition(colorTransition)
     .attr("fill", function (d) {
       d.total = emissionsYearData.get(d.id) || 0;
       return countryColorScale(d.total);
     });
 
+  disastersMapping = gMap.selectAll("image.disaster")
+    .data(disastersYearData);
+
   // remove previous disasters
-  gMap.selectAll("image.disaster")
+  disastersMapping
+    .exit()
+    .transition(disastersTransition)
     .remove();
 
   // plot shapes for disasters
-  gMap.selectAll("circles")
-    .data(disastersYearData)
+  disastersMapping
     .enter().append("image")
     .attr("class", "disaster")
+    //.transition(disastersTransition)
     //.attr("d", d => disasterShapes(d["Disaster Type"]))
     .attr("xlink:href", d => `icons/${d['Disaster Type']}.png`)
     .attr("width", "10px")
