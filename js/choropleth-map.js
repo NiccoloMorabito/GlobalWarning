@@ -47,21 +47,8 @@ const zoom = d3.zoom()
       //.each(function(d, i) { console.log(+d.Longitude, +d.Latitude); });
       .attr("transform", event.transform);
     
-/*
-source for this https://stackoverflow.com/questions/34323318/d3-us-state-map-with-markers-zooming-transform-issues
-    gMap.selectAll('image.disaster')
-      .attr('transform', function(){
-        translate = d3.select(this).attr("transform");
-        translate0 = parseFloat(translate.split("(")[1].split(",")[0]);
-        //translate0 -= event.transform.x / event.transform.k;
-        translate1 = parseFloat(translate.split(",")[1].trim(")"));
-        //translate1 -= event.transform.y / event.transform.k;
-        //return "translate(" + translate0 + ", 0) scale(" + event.transform.k + ")";
-        return "translate(" + translate0 +","+ translate1 + ")scale("+1/event.transform.k+")";
-      });
-    //  `translate(${projection([+d.Longitude, +d.Latitude])[0]}, ${projection([+d.Longitude, +d.Latitude])[1]})`
-    */
   });
+gMap.call(zoom);
 
 // zoom buttons
 d3.select("#zoom_in").on("click", function() {
@@ -80,7 +67,7 @@ slider.oninput = function() {
 }
 
 
-// legend TODO fix the background
+// LEGEND FOR COLORS
 var quantilesForLegend = [];
 EMS_QUANTILES.forEach(q => {
   quantilesForLegend.push({"size": EMS_QUANTILES.indexOf(q)*10, "value": q})
@@ -92,7 +79,7 @@ var legendContryColor = svgMap.append("g")
     .data(quantilesForLegend)
     .enter().append("g");
 
-// background rect
+/* background rect //TODO fix background color
 legendContryColor.append('rect')
   .attr('x', -80)
   .attr('y', -140)
@@ -101,7 +88,7 @@ legendContryColor.append('rect')
   .attr('stroke', 'grey')
   .attr('stroke-opacity', 0.1)
   .attr('fill', 'grey')
-  .attr('fill-opacity', 0.1);
+  .attr('fill-opacity', 0.1); */
 
 legendContryColor.append("rect")
   .style("fill", function(d, i) {
@@ -109,7 +96,7 @@ legendContryColor.append("rect")
   })
   .attr("x", 15)
   .attr("y", function(d, i) {
-    return - 2 - EMS_QUANTILES.indexOf(d.value)*20
+    return - 2 - i*20
   })
   .attr("width", 18)
   .attr("height", 18);
@@ -121,37 +108,26 @@ legendContryColor.append("text")
   .text(function(d) {return d.value + "+"});
 
 legendContryColor.append("text")
+  .attr("font-weight", 700) //TODO not working
   .attr("x", -5)
   .attr("y", - EMS_QUANTILES.length*20)
   .text("GHG emissions value (MtCO2e)");
 
 
+
 Promise.all([
   d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
   d3.csv("../data/CW_emissions.csv", d => d),
-  d3.csv("../data/EMDAT_disasters.csv", d2 => d2)
+  d3.csv("../data/EMDAT_disasters_reduced.csv", d2 => d2)
 ]).then(function(promises){
   const world = promises[0];
   const emissionsCsv = promises[1];
   const disastersCsv = promises[2];
-  /*
-  disasterColors = d3.scaleOrdinal()
-    .domain(disastersCsv.map(d => d["Disaster Type"])) some of the types are then excluded
-    .range(d3.schemeTableau10);
-  disasterShapes = d3.scaleOrdinal(
-    disastersCsv.map(d => d["Disaster Type"]),
-    d3.symbols.map(s => d3.symbol().type(s)())
-  )
-  //TODO there are 7 symbols and 10 disaster types
-  console.log(d3.symbols);
-  console.log(new Set(disastersCsv.map(d => d["Disaster Type"])));
-  */
-  
 
   // first map with the first year
   var emissionsYearData = getEmissionsDataForYear(emissionsCsv, START_YEAR);
   var disastersYearData = getDisastersDataForYear(disastersCsv, START_YEAR);
-  drawMap(world, emissionsYearData, disastersYearData);
+  drawAndUpdateMap(world, emissionsYearData, disastersYearData);
 
   // year selection
   d3.select("#yearSlider")
@@ -161,7 +137,7 @@ Promise.all([
       var yearInput = +d3.select(this).node().value;
       emissionsYearData = getEmissionsDataForYear(emissionsCsv, yearInput);
       disastersYearData = getDisastersDataForYear(disastersCsv, yearInput);
-      updateMap(emissionsYearData, disastersYearData);
+      drawAndUpdateMap(world, emissionsYearData, disastersYearData);
     });
 
   // animation button
@@ -177,7 +153,7 @@ Promise.all([
       else {
         emissionsYearData = getEmissionsDataForYear(emissionsCsv, y);
         disastersYearData = getDisastersDataForYear(disastersCsv, y);
-        updateMap(emissionsYearData, disastersYearData);
+        drawAndUpdateMap(world, emissionsYearData, disastersYearData);
         d3.select("#yearText").text(y);
         d3.select("#yearSlider").property('value', y);
         y += 1;
@@ -194,83 +170,65 @@ function toggleAnimationButton() {
   //button.disabled = true
 }
 
-function drawMap(world, emissionsYearData, disastersYearData){
-  // color countries
-  gMap.selectAll("path")
-    .data(world.features)
-    .join("path")
-    .attr("class", "countriesColor")
-      // draw each country
-      .attr("d", path.projection(projection))
-      // set the color of each country
-      .attr("fill", function (d) {
-        d.total = emissionsYearData.get(d.id) || 0;
-        return countryColorScale(d.total);
-      });
-
-  // plot icons for disasters
-  gMap.selectAll("image.disaster")
-    .data(disastersYearData) //.sort((a,b) => +b.n - +a.n).filter((d,i) => i<1000))
-    .enter().append("image")
-    .attr("class", "disaster")
-    //.attr("d", d => disasterShapes(d["Disaster Type"]))
-    .attr("xlink:href", 'icons/drought.png')
-    .attr("width", "10px")
-    .attr("height", "10px")
-    //.attr("transform",
-    //  d => `translate(${projection([+d.Longitude, +d.Latitude])})`
-    //)
-    .attr("x", function(d){ return projection([+d.Longitude, +d.Latitude])[0]})
-    .attr("y", function(d){ return projection([+d.Longitude, +d.Latitude])[1]})
-    //.attr("fill", d => disasterColors(d["Disaster Type"]));
-  
-  gMap.call(zoom);
-}
-
-function updateMap(emissionsYearData, disastersYearData){
+function drawAndUpdateMap(world, emissionsYearData, disastersYearData) {
   const colorTransition = d3.transition()
     .ease(d3.easeCubic)
     .duration(400);
   
-  const disastersTransition = d3.transition()
+  const disastersTransition = d3.transition() //TODO not ok for the animation
     .ease(d3.easeLinear)
     .duration(100);
-
-  // color countries
+  
+  // colors of countries
   gMap.selectAll("path.countriesColor")
-    .transition(colorTransition)
-    .attr("fill", function (d) {
-      d.total = emissionsYearData.get(d.id) || 0;
-      return countryColorScale(d.total);
-    });
+    .data(world.features)
+    .join(
+      enter => enter.append("path")
+        .attr("class", "countriesColor")
+        // draw each country
+        .attr("d", path.projection(projection))
+        // set the color of each country
+        .attr("fill", function (d) {
+          d.total = emissionsYearData.get(d.id) || 0;
+          return countryColorScale(d.total);
+        })
+        .call(enter => enter.transition(colorTransition)),
+      update => update.transition(colorTransition)
+        .attr("fill", function (d) {
+          d.total = emissionsYearData.get(d.id) || 0;
+          return countryColorScale(d.total);
+        }),
+    );
+  
+  // scatter-plot icons for disasters
+  gMap.selectAll("image.disaster")
+  .data(disastersYearData)
+  .join(
+    enter => enter.append("image")
+      .attr("id", d => `${d['Disaster Type'].replace(" ", "")}-mapIcons`)
+      .attr("class", "disaster")
+      .attr("xlink:href", d => `icons/${d['Disaster Type']}.png`)
+      .attr("width", "10px")
+      .attr("height", "10px")
+      .attr("x", function(d){ return projection([+d.Longitude, +d.Latitude])[0]})
+      .attr("y", function(d){ return projection([+d.Longitude, +d.Latitude])[1]})
 
-  disastersMapping = gMap.selectAll("image.disaster")
-    .data(disastersYearData);
-
-  // remove previous disasters
-  disastersMapping
-    .exit()
-    .transition(disastersTransition)
-    .remove();
-
-  // plot shapes for disasters
-  disastersMapping
-    .enter().append("image")
-    .attr("class", "disaster")
-    //.transition(disastersTransition)
-    //.attr("d", d => disasterShapes(d["Disaster Type"]))
-    .attr("xlink:href", d => `icons/${d['Disaster Type']}.png`)
-    .attr("width", "10px")
-    .attr("height", "10px")
-    //.attr("transform",
-    //  d => `translate(${projection([+d.Longitude, +d.Latitude])})`
-    //)
-    .attr("x", function(d){ return projection([+d.Longitude, +d.Latitude])[0]})
-    .attr("y", function(d){ return projection([+d.Longitude, +d.Latitude])[1]})
-    //.attr("fill", "blue"); //d => disasterColors(d["Disaster Type"])) //TODO decide whether to keep only colour
+      .call(enter => enter.transition(disastersTransition)),
+    update => update.transition(disastersTransition)
+      .attr("id", d => `${d['Disaster Type'].replace(" ", "")}-mapIcons`)
+      .attr("xlink:href", d => `icons/${d['Disaster Type']}.png`)
+      .attr("x", function(d){ return projection([+d.Longitude, +d.Latitude])[0]})
+      .attr("y", function(d){ return projection([+d.Longitude, +d.Latitude])[1]}),
+    exit => exit.transition(disastersTransition)
+      .remove(),
+  );
 
   //TODO still problem on the disasters when changing year and the map is zoomed
   gMap.call(zoom.transform, d3.zoomIdentity); // temp. solution (zooming out everytime the map is updated)
+
+  // plot legend
+  disastersTypes = new Set(disastersYearData.map(d => d['Disaster Type']));
+  drawLegendDisasters(disastersTypes);
 }
 
 
@@ -302,4 +260,107 @@ function getDisastersDataForYear(disastersCsv, year) {
     }
   })
   return newData;
+}
+
+
+// LEGEND FOR DISASTERS
+function drawLegendDisasters(disastersTypes) {
+  const transition = d3.transition().duration(100);
+
+  disastersTypes = Array.from(disastersTypes).sort();
+  console.log(disastersTypes);
+
+  // icons
+  svgMap
+    .selectAll("image.legendDisastersIcons")
+    //.each(d => console.log(d))
+    .data(disastersTypes, dt => dt)
+    .join(
+      enter => enter.append("image")
+        .attr("id", d => `${d.replace(" ", "")}-legendIcon`)
+        .attr("class", "legendDisastersIcons")
+        .attr("xlink:href", d => `icons/${d}.png`)
+        .attr("x", 0)
+        .attr("y", function(d, i) {return - 2 - i*30})
+        .attr("width", 18)
+        .attr("height", 18)
+        .on("mouseover", mouseoverDisaster)
+        .on("mouseout", mouseoutDisaster)
+        .call(enter => enter.transition(transition)),
+      update => update.transition(transition)
+        .attr("y", function(d, i) {return - 2 - i*30}),
+      exit => exit.transition(transition).remove(),
+    )
+    .attr("transform", "translate(70," + (height - 20) + ")");
+  
+  // text
+  svgMap
+    .selectAll("text.legendDisastersTexts")
+    .data(disastersTypes, dt => dt)
+    .join(
+      enter => enter.append("text")
+        .attr("id", d => `${d.replace(" ", "")}-legendText`)
+        .attr("class", "legendDisastersTexts")
+        .attr("x", 30)
+        .attr("y", function(d, i){return -7 - i*30})
+        .attr("dy", "1.3em")
+        .attr("width", 18)
+        .attr("height", 18)
+        .text(function(d) {return d})
+        .on("mouseover", mouseoverDisaster)
+        .on("mouseout", mouseoutDisaster)
+        .call(enter => enter.transition(transition)),
+      update => update.transition(transition)
+        .attr("y", function(d, i){return -7 - i*30}),
+      exit => exit.transition(transition).remove(),
+    )
+    .attr("transform", "translate(70," + (height - 20) + ")");
+  
+  // title
+  svgMap
+    .selectAll("text.legendDisastersTitle")
+    .data([1])
+    .join(
+      enter => enter.append("text")
+        .attr("class", "legendDisastersTitle")
+        .attr("font-weight", 700)
+        .attr("x", 0)
+        .attr("y", - disastersTypes.length * 30)
+        .text("Disasters")
+        .call(enter => enter.transition(transition)),
+      update => update.transition(transition)
+        .attr("y", - disastersTypes.length * 30),
+      exit => exit.transition(transition).remove(),
+    )
+    .attr("transform", "translate(70," + (height - 20) + ")");
+    
+}
+
+function mouseoverDisaster() {
+  // make the other disasters in the legend more transparent
+  svgMap
+    .selectAll("text.legendDisastersTexts,image.legendDisastersIcons")
+    .style("opacity", 0.1);
+  
+  // hide from the map all the icons of the non-selected disasters
+  svgMap.selectAll("image.disaster")
+    .style("opacity", 0);
+
+  // highlight the selected disaster's text/icon + icons on the map
+  id = this.id.split("-")[0];
+  svgMap.selectAll(`#${id}-legendText, #${id}-legendIcon, #${id}-mapIcons`)
+    .style("opacity", 1)
+    .attr("font-weight", 1000);
+  
+}
+
+function mouseoutDisaster() {
+  // make all the disasters normal again
+  svgMap.selectAll("text.legendDisastersTexts,image.legendDisastersIcons")
+    .style("opacity", 1)
+    .attr("font-weight", 300);
+
+  // show all the disasters icons again
+  svgMap.selectAll("image.disaster")
+    .style("opacity", 1);
 }
