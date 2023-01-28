@@ -1,6 +1,7 @@
 // source (TODO delete) https://d3-graph-gallery.com/graph/bubblemap_template.html
 //TODO put the zoom buttons inside the map
 //TODO put the legend(s) outside the map
+//TODO hovering over a country, some information could come out
 
 const COUNTRY_BIG_CATEGS = ["WORLD", "ANNEXI", "NONANNEXI", "BASIC", "UMBRELLA", "EUU", "LDC", "AOSIS"]
 const EXCLUDED_DIS_TYPES = ["Fog", "Insect infestation"]

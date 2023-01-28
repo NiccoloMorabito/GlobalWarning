@@ -5,14 +5,14 @@ const DISASTER_TYPE_TO_DESCRIPTION = new Map(
   [["Biological", "A hazard caused by the exposure to living organisms and their toxic substances (e.g. venom, mold) or vector-borne \
   diseases that they may carry. Examples are venomous wildlife and insects, poisonous plants, and mosquitoes carrying \
   disease-causing agents.\n\
-  Main types: Epidemic, Insect infestation, Animal Accident"], //TODO remove Animal Accident?
+  Main subtypes: Epidemic, Insect infestation."],
   ["Climatological", "A hazard caused by long-lived, meso- to macro-scale atmospheric processes ranging from intra-seasonal to \
   multi-decadal climate variability. \n\
-  Main types: Drought, Glacial Lake Outburst, Wildfire."],
+  Main subtypes: Drought, Glacial Lake Outburst, Wildfire."],
   ["Hydrological", "A hazard caused by the occurrence, movement, and distribution of surface and subsurface freshwater and saltwater.\n\
-  Main types: Flood, Landslide, Wave action."],
+  Main subtypes: Flood, Landslide, Wave action."],
   ["Meteorological", "A hazard caused by short-lived, micro- to meso-scale extreme weather and atmospheric conditions that last from \
-  minutes to days. Main types: Extreme Temperature and Storm."]
+  minutes to days. Main subtypes: Extreme Temperature and Storm."]
 ]);
 
 
@@ -161,10 +161,12 @@ function mouseoverBar() {
 }
 
 function mousemoveBar(event, d) {
-  Tooltip    
-    .html(DISASTER_TYPE_TO_DESCRIPTION.get(d["Disaster Subgroup"]))
+  let string = DISASTER_TYPE_TO_DESCRIPTION.get(d["Disaster Subgroup"])
+  Tooltip
+    .html(string)
     .style("left", (event.pageX+30) + "px")
     .style("top", (event.pageY) + "px")
+    .style("height", Math.floor(string.length / 2) + "px");
 }
 
 function mouseoutBar() {

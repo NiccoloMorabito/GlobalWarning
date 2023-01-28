@@ -3,7 +3,7 @@ const BIG_CATEGS = ["WORLD", "ANNEXI", "NONANNEXI", "BASIC", "UMBRELLA", "EUU", 
 //TODO fix these descriptions
 const BIG_CATEG_TO_DESCRIPTION = new Map(
   [["WORLD", "WORLD considers all the countries in the world that have data. The data also includes international bunker fuel related \
-  emissions and other territories that release anthropogenic emissions but are not included in the dataset"],
+  emissions and other territories that release anthropogenic emissions but are not included in the dataset."],
   ["ANNEXI", "Annex I Parties are 43 member states, including the European Union. These countries are classified as industrialized \
   countries and economies in transition. Of these, 24 are Annex II Parties, including the European Union, and 14 are Economies in \
   Transition."],
@@ -14,7 +14,7 @@ const BIG_CATEG_TO_DESCRIPTION = new Map(
   ["BASIC", "BASIC includes: Brazil, South Africa, India and China"],
   ["UMBRELLA", "The Umbrella Group (also known as the JUSCANZ) is a negotiation group consisting of 12 parties to the UNFCCC, \
   including: Belarus, Kazakhstan, Russia, Ukraine, Australia, Canada, Iceland, Japan, New Zealand, Norway, United States, Israel"],
-  ["EUU", "European Union"],
+  ["EUU", "European Union includes the 27 member states of the supranational political and economic union"],
   ["LDC", "Least Developed Countries (LDC) currently include 46 countries, mostly in Africa (33) and Asia (9)."],
   ["AOSIS", "Alliance of Small Island States (AOSIS) is an intergovernmental organization of low-lying coastal and small island \
   countries. There are 39 member states, mostly in the Caribbean (16) and the Pacific Ocean (15)."]
@@ -94,7 +94,7 @@ const createLineChart = (data, color) => {
   const group = d3.group(data, d => d.country);
 
   // Create line paths for each country
-  const path = svgLine.selectAll('path')
+  svgLine.selectAll('path')
     .data(group)
     .join('path')
       .attr('d', ([i, d]) => line(d))
@@ -184,10 +184,12 @@ function mouseoverLine() {
 }
 
 function mousemoveLine(event, d) {
+  let string = BIG_CATEG_TO_DESCRIPTION.get(d[0])
   Tooltip    
-    .html(BIG_CATEG_TO_DESCRIPTION.get(d[0]))
+    .html(string)
     .style("left", (event.pageX+30) + "px")
     .style("top", (event.pageY) + "px")
+    .style("height", Math.floor(string.length / 1.5) + "px");
 }
 
 function mouseoutLine() {
