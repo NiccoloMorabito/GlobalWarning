@@ -16,7 +16,7 @@ const DISASTER_TYPE_TO_DESCRIPTION = new Map(
 ]);
 
 
-// Parse the Data //TODO if you load the same file twice, call this function from the main script
+// Parse the Data
 d3.csv("../data/EMDAT_disasters_barchart.csv").then( function(data) {
     // set the dimensions and margins of the graph
     const margin = {top: 10, right: 30, bottom: 20, left: 50},
@@ -25,27 +25,12 @@ d3.csv("../data/EMDAT_disasters_barchart.csv").then( function(data) {
     
     // append the barSvg object to the body of the page
     const barSvg = d3.select("#bar")
+      .append("center")
       .append("svg")
       .attr("width", width + margin.left + margin.right)
       .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform",`translate(${margin.left},${margin.top})`);
-
-
-  // Preparing data (done with python so far)
-  /*
-  // List of disaster groups (showing them on the X axis)
-  const dis_groups = data.columns.slice(1)
-  df[df["Year"].isin([1970, 2019])].groupby(["Year", "Disaster Subgroup"])["index"].count()
-  var filteredData = [];
-  data.forEach(function(d) {
-    if (+d.Year === 1970 || +d.Year === 2019) {
-      filteredData.push(d)
-    }
-  });
-  const grouping = d3.group(filteredData, d => d.country);
-  const count = d3.rollup(filteredData, v => v.length, d => d["Disaster Subgroup"])
-  */
 
   // List of subgroups = header of the csv files = years
   const subgroups = data.columns.slice(1)
@@ -93,6 +78,7 @@ d3.csv("../data/EMDAT_disasters_barchart.csv").then( function(data) {
     .selectAll("rect")
     .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
     .join("rect")
+      .attr("id", "bars")
       .attr("x", d => xSubgroup(d.key))
       .attr("y", d => y(d.value))
       .attr("width", xSubgroup.bandwidth())
@@ -146,16 +132,25 @@ d3.csv("../data/EMDAT_disasters_barchart.csv").then( function(data) {
     .attr("transform", "rotate(-90)")
     .text("Frequency")
     .style('font-size', '15px');
+  
+  // title of the visualization
+  barSvg.append("text")
+    .attr("x", (width / 2))             
+    .attr("y", margin.top)
+    .attr("text-anchor", "middle")  
+    .style("font-size", "12px") 
+    .style("font-weight", 700)
+    .text("Evolution of frequency of main disaster types in the last 50 years");
 
 })
 
 function mouseoverBar() {
   // make the other bars more transparent
-  d3.selectAll('g > rect')
+  d3.selectAll("#bars")
     .style("opacity", 0.5)
 
   // highlight the selected bar
-  d3.select(this).selectAll('rect')
+  d3.select(this).selectAll("#bars")
     .style("opacity", 1)
     .style("stroke", "black")
     .style("stroke-width", 2)
@@ -174,11 +169,11 @@ function mousemoveBar(event, d) {
 
 function mouseoutBar() {
   // make all the bars visible again
-  d3.selectAll('rect')
+  d3.selectAll("#bars")
     .style("opacity", 1)
 
   // undo the highlight of the selected bar
-  d3.select(this).selectAll('rect')
+  d3.select(this).selectAll("#bars")
     .style("stroke-width", null);
 
   // remove the tooltip

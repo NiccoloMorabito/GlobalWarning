@@ -79,17 +79,6 @@ var legendContryColor = svgMap.append("g")
     .data(quantilesForLegend)
     .enter().append("g");
 
-/* background rect //TODO fix background color
-legendContryColor.append('rect')
-  .attr('x', -80)
-  .attr('y', -140)
-  .attr('width', 400) //TODO change these values, they go outside of the borders
-  .attr('height', 400)
-  .attr('stroke', 'grey')
-  .attr('stroke-opacity', 0.1)
-  .attr('fill', 'grey')
-  .attr('fill-opacity', 0.1); */
-
 legendContryColor.append("rect")
   .style("fill", function(d, i) {
     return countryColorScale(d.value)
@@ -108,10 +97,10 @@ legendContryColor.append("text")
   .text(function(d) {return d.value + "+"});
 
 legendContryColor.append("text")
-  .attr("font-weight", 700) //TODO not working
   .attr("x", -5)
   .attr("y", - EMS_QUANTILES.length*20)
-  .text("GHG emissions value (MtCO2e)");
+  .text("GHG emissions value (MtCO2e)")
+  .attr("font-weight", 700); //TODO not working
 
 
 
@@ -153,7 +142,7 @@ Promise.all([
       else {
         emissionsYearData = getEmissionsDataForYear(emissionsCsv, y);
         disastersYearData = getDisastersDataForYear(disastersCsv, y);
-        drawAndUpdateMap(world, emissionsYearData, disastersYearData);
+        drawAndUpdateMap(world, emissionsYearData, disastersYearData, transitionForDisasters=false);
         d3.select("#yearText").text(y);
         d3.select("#yearSlider").property('value', y);
         y += 1;
@@ -163,22 +152,23 @@ Promise.all([
 });
 
 function toggleAnimationButton() {
-  //TODO this method makes the button non-clickable anymore
+  //TODO the toggle function below makes the button non-clickable anymore
   let button = document.getElementById("animationButton");
   button.classList.toggle(playIconClassName);
   button.classList.toggle(pauseIconClassName);
-  //button.disabled = true
 }
 
-function drawAndUpdateMap(world, emissionsYearData, disastersYearData) {
+function drawAndUpdateMap(world, emissionsYearData, disastersYearData, transitionForDisasters = true) {
   const colorTransition = d3.transition()
     .ease(d3.easeCubic)
     .duration(400);
   
-  const disastersTransition = d3.transition() //TODO not ok for the animation
+  if (transitionForDisasters) disasterTransitionDuration = 400;
+  else disasterTransitionDuration = 0;
+  const disastersTransition = d3.transition()
     .ease(d3.easeLinear)
-    .duration(100);
-  
+    .duration(disasterTransitionDuration);
+    
   // colors of countries
   gMap.selectAll("path.countriesColor")
     .data(world.features)
@@ -268,7 +258,6 @@ function drawLegendDisasters(disastersTypes) {
   const transition = d3.transition().duration(100);
 
   disastersTypes = Array.from(disastersTypes).sort();
-  console.log(disastersTypes);
 
   // icons
   svgMap
@@ -326,7 +315,7 @@ function drawLegendDisasters(disastersTypes) {
         .attr("font-weight", 700)
         .attr("x", 0)
         .attr("y", - disastersTypes.length * 30)
-        .text("Disasters")
+        .text("Natural disasters")
         .call(enter => enter.transition(transition)),
       update => update.transition(transition)
         .attr("y", - disastersTypes.length * 30),

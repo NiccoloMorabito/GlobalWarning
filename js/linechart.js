@@ -26,7 +26,8 @@ const BIG_CATEG_TO_LABEL = new Map(
   ["BASIC", "BASIC"],
   ["UMBRELLA", "UMBRELLA"],
   ["LDC", "LDC"],
-  ["AOSIS", "AOSIS"]
+  ["AOSIS", "AOSIS"],
+  ["EUU", "European Union"]
 ]);
 
 var Tooltip = d3.select("#line")
@@ -72,8 +73,7 @@ const createLineChart = (data, color) => {
   const margins = {top: 20, right: 100, bottom: 80, left: 60};
 
   // Create the SVG container
-  svgLine = d3.select("#line")
-    .append("svg")
+  svgLine = d3.select("#line > center > svg")
     .attr("viewBox", [0, 0, width, height]);
 
   // Define x-axis, y-axis, and color scales
@@ -153,6 +153,16 @@ const createLineChart = (data, color) => {
     .attr("transform", "rotate(-90)")
     .text("GHG emissions value (MtCO2e)")
     .style('font-size', '9px');
+  
+  // title of the visualization
+  svgLine.append("text")
+    .attr("x", (width / 2))             
+    .attr("y", margins.top)
+    .attr("text-anchor", "middle")  
+    .style("font-size", "12px") 
+    .style("font-weight", 700)
+    .text("Overall Emissions of greenhouse gases during time");
+  
 }
 
 function mouseoverLine() {

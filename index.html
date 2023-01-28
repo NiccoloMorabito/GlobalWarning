@@ -34,7 +34,7 @@
               <ul class="navbar-nav ms-auto">
                 <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#problem">The problem</a></li>
                 <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#consequences">The consequences</a></li>
-                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#relation">The relation</a></li>
+                <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#link">The link</a></li>
                 <li class="nav-item mx-0 mx-lg-1"><a class="nav-link py-3 px-0 px-lg-3 rounded" href="#about">About</a></li>
               </ul>
           </div>
@@ -49,13 +49,12 @@
           <!-- Icon Divider-->
           <div class="divider-custom divider-light">
               <div class="divider-custom-line"></div>
-              <!--
-              <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
+              <div class="divider-custom-icon"><i class="fas fa-globe"></i></div>
               <div class="divider-custom-line"></div>
-              -->
+            </div>
           </div>
           <!-- Masthead Subheading-->
-          <p class="masthead-subheading font-weight-light mb-0">Visual Analytics Project - 2022/2023</p>
+          <p class="masthead-subheading font-weight-light mb-0">A Look at the Impact of Greenhouse Gas Emissions on Climate</p>
       </div>
   </header>
 
@@ -67,15 +66,19 @@
           <!-- Icon Divider-->
           <div class="divider-custom">
               <div class="divider-custom-line"></div>
-              <!--
-              <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-              <div class="divider-custom-line"></div>
-              -->
           </div>
 
           <!-- Linechart -->
           <div id="line" class="responsive-svg-container">
-            <h3> GHG Emissions per geographical category during time </h3>
+            <p align="justify">
+                Climate change is a global phenomenon caused by the increase of <b>greenhouse gases</b> (GHGs) in the atmosphere. These gases, including <i>carbon dioxide</i> (CO2), <i>methane</i> (CH4), <i>nitrous oxide</i> (N2O), and <i>F-gases</i> (hydrofluorocarbons and perfluorocarbons), trap heat from the sun and warm the planet, leading to a warming of the Earth's climate and general changes in weather patterns and ecosystems.            </p>
+            <p>How are overall global GHG emissions evolving over time?</p>
+            <center>
+                <svg></svg>
+            </center>
+            <p align="justify">
+                All the gases use the same unit of measurement (MtCO2) that represents the number of metric tons of a GHG whose atmospheric impact has been standardized to that of one unit mass of carbon dioxide, based on the global warming potential of the gas. This is the reason why it makes sense to directly compare the different gases.
+            </p>
           </div>
 
       </div>
@@ -89,39 +92,39 @@
             <!-- Icon Divider-->
             <div class="divider-custom">
                 <div class="divider-custom-line"></div>
-                <!--
-                <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-                <div class="divider-custom-line"></div>
-                -->
             </div>
   
             <!-- Barchart -->
             <div id="bar" class="responsive-svg-container">
-              <h3> Natural events in the last 50 years </h3>
+                <p align="justify">
+                    The consequences of the <b>greenhouse effect</b> can include significant changes in global temperatures, sea level rise, altered precipitation patterns and extreme weather events (storms, hurricanes, heatwaves, droughts, etc). These changes can have severe impacts on ecosystems, human health and well-being, agriculture and the economy.
+                </p>
+                <p>How is the frequency of different types of natural disasters evolving over time?</p>
             </div>
   
         </div>
     </section>
 
-  <!-- The Relation Section-->
-  <section class="page-section relation" id="relation">
+  <!-- The Link Section-->
+  <section class="page-section link" id="link">
     <div class="container">
         <!-- Heading-->
-        <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">The Relation</h2>
+        <h2 class="page-section-heading text-center text-uppercase text-secondary mb-0">The Link</h2>
         <!-- Icon Divider-->
         <div class="divider-custom">
             <div class="divider-custom-line"></div>
-            <!--
-            <div class="divider-custom-icon"><i class="fas fa-star"></i></div>
-            <div class="divider-custom-line"></div>
-            -->
         </div>
 
         <!-- Map -->
         <div id="map" class="responsive-svg-container">
-          <h3 class="center"> GHG emissions per country per year </h3>
-          <button id="zoom_in" class="zoom-button"></button>
-          <button id="zoom_out" class="unzoom-button"></button>
+            <p align="justify">
+                After noticing a similar behaviour between the increase of greenhouse gases emissions and the increase in the frequency of natural disasters in the last decades, it is crucial to study and analyze the two phenomena together in a comprehensive manner to study what is the actual <b>relationship</b> and validate the initial hypothesises, but also to deeply understand the data and make distinctions according to the time and the geographical area.
+            </p>
+            <p>
+                What is the relationship between the consequences of climate change and the emissions of GHG in different countries in the last century? Are the consequences homogeneously and/or fairly distributed in the world according to the GHG emissions? Does climate change affect different countries differently?
+            </p>
+            <button id="zoom_in" class="zoom-button"></button>
+            <button id="zoom_out" class="unzoom-button"></button>
         </div>
         
         <div class="slidecontainer" >
@@ -148,45 +151,27 @@
           </div>
           <!-- About Section Content-->
           <div class="row">
-            <!-- TODO WIP
-              <div class="col-lg-4 ms-auto"><p class="lead">The final aim of this object is to study the relation between the consequences of climate change (in terms of the number and frequency of natural disasters and extreme weather and temperature events) and the emissions of GHG all around the world in the last 100 years.</p></div>
-              <div class="col-lg-4 me-auto"><p class="lead">Currently, the visualizations in this website only focus on the GHG emissions during time and they do not include the data about natural disasters and extreme weather events, that will be added soon</p></div>
-            -->
+
+            <div class="col-lg-4 ms-auto">
+                <p class="lead" align="justify">
+                    The project "Global Warning" and this website are part of the work carried out for the Visual Analytics course (AY 2022/2023) at the CentraleSupélec university. The purpose is to to provide hands-on experience designing and implementing a useful visualization tool.
+                </p>
+            </div>           
+            <div class="col-lg-4 me-auto">
+                <p class="lead" align="justify">
+                    The data for the visualizations above is taken from
+                    <a href="https://www.climatewatchdata.org/" style="color: white" target=”_blank”>ClimateWatch</a>
+                     and 
+                    <a href="https://www.emdat.be/" style="color: white" target=”_blank”>EMTData</a>.
+                    The code is available on
+                    <a href="https://github.com/NiccoloMorabito/niccolomorabito.github.io" style="color: white" target=”_blank”>GitHub</a>.
+                    
+                    
+                </p>
+            </div>
           </div>
       </div>
   </section>
-
-  <!-- Footer
-  <footer class="footer text-center">
-      <div class="container">
-          <div class="row">
-              <div class="col-lg-4 mb-5 mb-lg-0">
-                  <h4 class="text-uppercase mb-4">Location</h4>
-                  <p class="lead mb-0">
-                      2215 John Daniel Drive
-                      <br />
-                      Clark, MO 65243
-                  </p>
-              </div>
-              <div class="col-lg-4 mb-5 mb-lg-0">
-                  <h4 class="text-uppercase mb-4">Around the Web</h4>
-                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-facebook-f"></i></a>
-                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-twitter"></i></a>
-                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-linkedin-in"></i></a>
-                  <a class="btn btn-outline-light btn-social mx-1" href="#!"><i class="fab fa-fw fa-dribbble"></i></a>
-              </div>
-              <div class="col-lg-4">
-                  <h4 class="text-uppercase mb-4">About Freelancer</h4>
-                  <p class="lead mb-0">
-                      Freelance is a free to use, MIT licensed Bootstrap theme created by
-                      <a href="http://startbootstrap.com">Start Bootstrap</a>
-                      .
-                  </p>
-              </div>
-          </div>
-      </div>
-  </footer>
-  -->
   
   <!-- Copyright Section-->
   <div class="copyright py-4 text-center text-white">
