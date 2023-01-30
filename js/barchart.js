@@ -1,6 +1,3 @@
-// source: https://d3-graph-gallery.com/graph/barplot_grouped_basicWide.html
-
-//TODO fix these descriptions
 const DISASTER_TYPE_TO_DESCRIPTION = new Map(
   [["Biological", "A hazard caused by the exposure to living organisms and their toxic substances (e.g. venom, mold) or vector-borne \
   diseases that they may carry. Examples are venomous wildlife and insects, poisonous plants, and mosquitoes carrying \

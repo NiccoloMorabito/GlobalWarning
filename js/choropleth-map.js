@@ -1,8 +1,3 @@
-// source (TODO delete) https://d3-graph-gallery.com/graph/bubblemap_template.html
-//TODO put the zoom buttons inside the map
-//TODO put the legend(s) outside the map
-//TODO hovering over a country, some information could come out
-
 const COUNTRY_BIG_CATEGS = ["WORLD", "ANNEXI", "NONANNEXI", "BASIC", "UMBRELLA", "EUU", "LDC", "AOSIS"]
 const EXCLUDED_DIS_TYPES = ["Fog", "Insect infestation"]
 const START_YEAR = 1900; //1850 without disasters
@@ -101,7 +96,7 @@ legendContryColor.append("text")
   .attr("x", -5)
   .attr("y", - EMS_QUANTILES.length*20)
   .text("GHG emissions value (MtCO2e)")
-  .attr("font-weight", 700); //TODO not working
+  .attr("font-weight", 700);
 
 
 
@@ -121,7 +116,7 @@ Promise.all([
 
   // year selection
   d3.select("#yearSlider")
-    .on("change", function() {
+    .on("input", function() {
       d3.select("#allYearsCheckbox").property('checked', false);
 
       var yearInput = +d3.select(this).node().value;
@@ -153,7 +148,6 @@ Promise.all([
 });
 
 function toggleAnimationButton() {
-  //TODO the toggle function below makes the button non-clickable anymore
   let button = document.getElementById("animationButton");
   button.classList.toggle(playIconClassName);
   button.classList.toggle(pauseIconClassName);
@@ -214,8 +208,7 @@ function drawAndUpdateMap(world, emissionsYearData, disastersYearData, transitio
       .remove(),
   );
 
-  //TODO still problem on the disasters when changing year and the map is zoomed
-  gMap.call(zoom.transform, d3.zoomIdentity); // temp. solution (zooming out everytime the map is updated)
+  gMap.call(zoom.transform, d3.zoomIdentity); // zooming out everytime the map is updated
 
   // plot legend
   disastersTypes = new Set(disastersYearData.map(d => d['Disaster Type']));

@@ -1,13 +1,11 @@
 const parseTime = d3.timeParse("%Y");
 const BIG_CATEGS = ["WORLD", "ANNEXI", "NONANNEXI", "BASIC", "UMBRELLA", "EUU", "LDC", "AOSIS"]
-//TODO fix these descriptions
 const BIG_CATEG_TO_DESCRIPTION = new Map(
   [["WORLD", "WORLD considers all the countries in the world that have data. The data also includes international bunker fuel related \
   emissions and other territories that release anthropogenic emissions but are not included in the dataset."],
   ["ANNEXI", "Annex I Parties are 43 member states, including the European Union. These countries are classified as industrialized \
   countries and economies in transition. Of these, 24 are Annex II Parties, including the European Union, and 14 are Economies in \
   Transition."],
-  //TODO add some example countries in the category; https://en.wikipedia.org/wiki/United_Nations_Framework_Convention_on_Climate_Change#Annex_I_countries
   ["NONANNEXI", "Non-AnnexI includes parties, mostly developing nations, that have ratified or acceded to the United Nations \
   Framework Convention on Climate Change and are not included in Annex I of the Kyoto Protocol. They include mainly South-America, \
   Africa and Asia."],
