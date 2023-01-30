@@ -17,7 +17,7 @@ const DISASTER_TYPE_TO_DESCRIPTION = new Map(
 
 
 // Parse the Data
-d3.csv("../data/EMDAT_disasters_barchart.csv").then( function(data) {
+d3.csv("data/EMDAT_disasters_barchart.csv").then( function(data) {
     // set the dimensions and margins of the graph
     const margin = {top: 10, right: 30, bottom: 20, left: 50},
         width = 600,

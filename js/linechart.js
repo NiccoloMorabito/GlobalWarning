@@ -43,7 +43,7 @@ var Tooltip = d3.select("#line")
   .style("padding", "5px")
 
 // load the data
-d3.csv("../data/CW_emissions.csv", d => {
+d3.csv("data/CW_emissions.csv", d => {
   return {
     'country': d.country,
     'gas': d.gas,
