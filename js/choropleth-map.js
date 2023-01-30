@@ -107,8 +107,8 @@ legendContryColor.append("text")
 
 Promise.all([
   d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson"),
-  d3.csv("../data/CW_emissions.csv", d => d),
-  d3.csv("../data/EMDAT_disasters_reduced.csv", d2 => d2)
+  d3.csv("data/CW_emissions.csv", d => d),
+  d3.csv("data/EMDAT_disasters_reduced.csv", d2 => d2)
 ]).then(function(promises){
   const world = promises[0];
   const emissionsCsv = promises[1];
