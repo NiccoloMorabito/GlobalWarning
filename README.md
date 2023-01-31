@@ -1,5 +1,4 @@
-# Global Warning
-## A Look at the Impact of Greenhouse Gas Emissions on Climate
+# Global Warning: A Look at the Impact of Greenhouse Gas Emissions on Climate
 
 The project "Global Warning" and this website are part of the work carried out for the Visual Analytics course (AY 2022/2023) at the CentraleSupélec university. The purpose is to provide hands-on experience designing and implementing a useful visualization tool.
 
